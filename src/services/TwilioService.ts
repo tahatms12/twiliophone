@@ -1,16 +1,24 @@
+interface TwilioCredentials {
+  accountSid: string;
+  authToken: string;
+  phoneNumber: string;
+}
+
 export class TwilioService {
   private device: any = null;
   private token: string;
+  private credentials: TwilioCredentials;
 
-  constructor(token: string) {
+  constructor(token: string, credentials: TwilioCredentials) {
     this.token = token;
+    this.credentials = credentials;
   }
 
   async initialize(): Promise<void> {
     try {
       // In a real implementation, you would use Twilio's Voice SDK
       // For now, we'll simulate the connection
-      console.log('Initializing Twilio with token:', this.token);
+      console.log('Initializing Twilio with credentials for:', this.credentials.phoneNumber);
       
       // Simulate device setup
       this.device = {
@@ -31,10 +39,13 @@ export class TwilioService {
       throw new Error('Device not ready');
     }
 
-    console.log('Making call to:', phoneNumber);
+    console.log(`Making call from ${this.credentials.phoneNumber} to:`, phoneNumber);
     
     // Simulate call connection
-    return this.device.connect({ To: phoneNumber });
+    return this.device.connect({ 
+      To: phoneNumber,
+      From: this.credentials.phoneNumber 
+    });
   }
 
   async hangup(): Promise<void> {
@@ -46,9 +57,9 @@ export class TwilioService {
     return this.device.disconnect();
   }
 
-  private simulateCall(params: { To: string }): Promise<void> {
+  private simulateCall(params: { To: string; From: string }): Promise<void> {
     return new Promise((resolve) => {
-      console.log('Simulating call to:', params.To);
+      console.log(`Simulating call from ${params.From} to:`, params.To);
       setTimeout(() => {
         console.log('Call connected (simulated)');
         resolve();

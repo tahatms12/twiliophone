@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import PhoneInterface from './components/PhoneInterface';
+import CredentialsForm from './components/CredentialsForm';
 import { TwilioService } from './services/TwilioService';
+
+interface TwilioCredentials {
+  accountSid: string;
+  authToken: string;
+  phoneNumber: string;
+}
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [twilioService, setTwilioService] = useState<TwilioService | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [credentials, setCredentials] = useState<TwilioCredentials | null>(null);
 
-  useEffect(() => {
-    initializeTwilio();
-  }, []);
-
-  const initializeTwilio = async () => {
+  const initializeTwilio = async (creds: TwilioCredentials) => {
     try {
       setLoading(true);
       setError(null);
       
-      // Fetch Twilio token from Netlify function
-      const response = await fetch('/.netlify/functions/twilio-token');
+      // Generate a simple token for demo purposes
+      // In a real app, you'd send credentials to your backend to generate a proper token
+      const mockToken = btoa(JSON.stringify({
+        accountSid: creds.accountSid,
+        authToken: creds.authToken,
+        phoneNumber: creds.phoneNumber,
+        timestamp: Date.now()
+      }));
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch Twilio token');
-      }
-      
-      const { token } = await response.json();
-      
-      const service = new TwilioService(token);
+      const service = new TwilioService(mockToken, creds);
       await service.initialize();
       
       setTwilioService(service);
+      setCredentials(creds);
       setIsConnected(true);
     } catch (err) {
       console.error('Failed to initialize Twilio:', err);
@@ -37,6 +42,13 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDisconnect = () => {
+    setTwilioService(null);
+    setCredentials(null);
+    setIsConnected(false);
+    setError(null);
   };
 
   if (loading) {
@@ -58,10 +70,10 @@ function App() {
           <h2 className="text-white text-xl font-semibold mb-2">Connection Error</h2>
           <p className="text-red-200 mb-4">{error}</p>
           <button
-            onClick={initializeTwilio}
+            onClick={() => setError(null)}
             className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
           >
-            Retry Connection
+            Try Again
           </button>
         </div>
       </div>
@@ -79,13 +91,32 @@ function App() {
               {isConnected ? 'Connected' : 'Disconnected'}
             </span>
           </div>
+          {credentials && (
+            <div className="mt-2 text-white/60 text-sm">
+              Using number: {credentials.phoneNumber}
+            </div>
+          )}
         </header>
 
-        {twilioService && (
-          <PhoneInterface 
-            twilioService={twilioService}
-            isConnected={isConnected}
-          />
+        {!isConnected ? (
+          <CredentialsForm onConnect={initializeTwilio} />
+        ) : (
+          <div>
+            <div className="text-center mb-4">
+              <button
+                onClick={handleDisconnect}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+              >
+                Disconnect & Clear Credentials
+              </button>
+            </div>
+            {twilioService && (
+              <PhoneInterface 
+                twilioService={twilioService}
+                isConnected={isConnected}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>
