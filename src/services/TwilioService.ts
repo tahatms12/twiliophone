@@ -6,11 +6,9 @@ interface TwilioCredentials {
 
 export class TwilioService {
   private device: any = null;
-  private token: string;
   private credentials: TwilioCredentials;
 
-  constructor(token: string, credentials: TwilioCredentials) {
-    this.token = token;
+  constructor(credentials: TwilioCredentials) {
     this.credentials = credentials;
   }
 

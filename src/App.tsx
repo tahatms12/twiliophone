@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PhoneInterface from './components/PhoneInterface';
 import CredentialsForm from './components/CredentialsForm';
 import { TwilioService } from './services/TwilioService';
@@ -21,16 +21,7 @@ function App() {
       setLoading(true);
       setError(null);
       
-      // Generate a simple token for demo purposes
-      // In a real app, you'd send credentials to your backend to generate a proper token
-      const mockToken = btoa(JSON.stringify({
-        accountSid: creds.accountSid,
-        authToken: creds.authToken,
-        phoneNumber: creds.phoneNumber,
-        timestamp: Date.now()
-      }));
-      
-      const service = new TwilioService(mockToken, creds);
+      const service = new TwilioService(creds);
       await service.initialize();
       
       setTwilioService(service);
