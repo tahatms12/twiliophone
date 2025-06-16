@@ -18,17 +18,14 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Get Twilio credentials from environment variables
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const twimlAppSid = process.env.TWILIO_TWIML_APP_SID;
+    const { accountSid, authToken } = JSON.parse(event.body || '{}');
 
-    if (!accountSid || !authToken || !twimlAppSid) {
+    if (!accountSid || !authToken) {
       return {
-        statusCode: 500,
+        statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: 'Missing Twilio configuration. Please set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_TWIML_APP_SID environment variables.'
+          error: 'Missing accountSid or authToken'
         }),
       };
     }
@@ -41,12 +38,12 @@ exports.handler = async (event, context) => {
     const identity = `user_${Date.now()}`;
 
     // Create an access token
-    const accessToken = new AccessToken(accountSid, process.env.TWILIO_API_KEY || accountSid, process.env.TWILIO_API_SECRET || authToken);
+    const accessToken = new AccessToken(accountSid, accountSid, authToken);
     accessToken.identity = identity;
 
     // Create a Voice grant and add it to the token
     const voiceGrant = new VoiceGrant({
-      outgoingApplicationSid: twimlAppSid,
+      outgoingApplicationSid: process.env.TWILIO_TWIML_APP_SID || 'demo_app_sid',
       incomingAllow: true,
     });
     accessToken.addGrant(voiceGrant);

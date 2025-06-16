@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-
-interface TwilioCredentials {
-  accountSid: string;
-  authToken: string;
-  phoneNumber: string;
-}
+import { TwilioCredentials } from '../types';
 
 interface CredentialsFormProps {
   onConnect: (credentials: TwilioCredentials) => void;

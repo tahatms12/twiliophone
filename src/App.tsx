@@ -2,12 +2,7 @@ import { useState } from 'react';
 import PhoneInterface from './components/PhoneInterface';
 import CredentialsForm from './components/CredentialsForm';
 import { TwilioService } from './services/TwilioService';
-
-interface TwilioCredentials {
-  accountSid: string;
-  authToken: string;
-  phoneNumber: string;
-}
+import { TwilioCredentials } from './types';
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
@@ -36,6 +31,9 @@ function App() {
   };
 
   const handleDisconnect = () => {
+    if (twilioService) {
+      twilioService.destroy();
+    }
     setTwilioService(null);
     setCredentials(null);
     setIsConnected(false);
