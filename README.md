@@ -4,7 +4,8 @@ Bare-bones phone interface using the Twilio Voice and Conversations SDKs.
 
 ## Environment Variables
 
-Create a `.env` file based on `.env.sample` with the following values:
+Set the following variables in your Netlify project settings or in a local
+`.env` file for development:
 
 - `REACT_APP_TWILIO_ACCESS_TOKEN_SERVER_URL` – Endpoint that returns a Twilio access token for Voice and Conversations.
 - `REACT_APP_TWILIO_CONVERSATIONS_SERVICE_SID` – Conversations service identifier used for SMS.
