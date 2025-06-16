@@ -1,0 +1,13 @@
+[build]
+  command = "npm ci --legacy-peer-deps --no-audit --progress=false && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NPM_FLAGS = "--legacy-peer-deps --no-audit --progress=false"
+  REACT_APP_TWILIO_ACCOUNT_SID = "your_sid"
+  REACT_APP_TWILIO_AUTH_TOKEN  = "your_token"
+
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200
